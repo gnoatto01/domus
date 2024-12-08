@@ -87,6 +87,8 @@ public class MembroDePatrulha extends Pessoa {
     @Column(name = "telefone_auxilar")
     private String telefoneAuxiliar; 
 
+    private String logradouro; 
+
     private String bairro;
 
     private String cidade; 
@@ -285,6 +287,12 @@ public class MembroDePatrulha extends Pessoa {
     }
     public void setMembroPatrulhaId(Long membroPatrulhaId) {
         this.membroPatrulhaId = membroPatrulhaId;
+    }
+    public String getLogradouro() {
+        return logradouro;
+    }
+    public void setLogradouro(String logradouro) {
+        this.logradouro = logradouro;
     } 
 
     

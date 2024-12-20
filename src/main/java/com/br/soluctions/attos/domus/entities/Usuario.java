@@ -30,16 +30,16 @@ public class Usuario implements Serializable {
     private UUID usuarioId; 
 
     @OneToOne
-    @JoinColumn(name = "pessoa_id", nullable = false)
+    @JoinColumn(name = "pessoa_id")
     private Pessoa pessoa; 
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String usuario; 
 
     @Column(nullable = false)
     private String senha;
 
-     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "tb_nivel_acesso_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "nivel_acesso_id"))
     @Column(name = "nivel_acesso")
     private Set<NivelDeAcesso> nivelDeAcesso; 

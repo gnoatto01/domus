@@ -6,7 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-
+import com.br.soluctions.attos.domus.entities.Pessoa;
 import com.br.soluctions.attos.domus.entities.Usuario;
 import com.br.soluctions.attos.domus.entities.NivelDeAcesso.Valores;
 import com.br.soluctions.attos.domus.repositories.NivelDeAcessoRepository;
@@ -36,8 +36,8 @@ public class ConfiguracaoUsuarioAdministrador implements CommandLineRunner  {
 
         var usuarioAdmin = usuarioRepository.findByUsuario("admin"); 
 
-        var pessoaAdmin = pessoaRepository.findById(1L)
-        .orElseThrow(() -> new IllegalStateException("Pessoa com ID " + 1 + " não encontrada")); 
+        // var pessoaAdmin = pessoaRepository.findById(1L)
+        // .orElseThrow(() -> new Pessoa() pessoa ); 
 
       
            usuarioAdmin.ifPresentOrElse(
@@ -47,7 +47,7 @@ public class ConfiguracaoUsuarioAdministrador implements CommandLineRunner  {
                 () -> {
                     var usuario = new Usuario();
                     usuario.setUsuario("admin");
-                    usuario.setPessoa(pessoaAdmin);
+                    //usuario.setPessoa(pessoaAdmin);
                     usuario.setSenha(bCryptPasswordEncoder.encode("@ttosAdmin"));
                     usuario.setNivelDeAcesso(Set.of(nivelDeAcessoAdmin));
                     usuario.setTenantId("domus_default");

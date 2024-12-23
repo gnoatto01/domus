@@ -34,7 +34,7 @@ public class ConfiguracaoDeSeguranca {
     @Value("${jwt.private.key}")
     private RSAPrivateKey privateKey;
 
-      @Bean
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
@@ -47,6 +47,7 @@ public class ConfiguracaoDeSeguranca {
         return http.build();
     }
 
+ 
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
@@ -64,3 +65,4 @@ public class ConfiguracaoDeSeguranca {
         return new BCryptPasswordEncoder();
     }
 }
+

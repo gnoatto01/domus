@@ -30,7 +30,7 @@ public class TokenService {
     public String generateToken(LoginRequest loginRequest) {
         var user = usuarioRepository.findByUsername(loginRequest.username());
         Instant now = Instant.now();
-        long expiresIn = 86400L;
+        long expiresIn = 10L;
 
         var scopes = user.get().getAccessLevels()
                 .stream()

@@ -11,54 +11,54 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
-import com.br.soluctions.attos.domus.dtos.RequisicaoDeLogin;
-import com.br.soluctions.attos.domus.entities.NivelDeAcesso;
-import com.br.soluctions.attos.domus.repositories.UsuarioRepository;
+import com.br.soluctions.attos.domus.dtos.LoginRequest;
+import com.br.soluctions.attos.domus.entities.AccessLevel;
+import com.br.soluctions.attos.domus.repositories.UserRepository;
 
 @Service
 public class TokenService {
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
 
-    public TokenService(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UsuarioRepository usuarioRepository) {
+    public TokenService(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UserRepository usuarioRepository) {
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
         this.usuarioRepository = usuarioRepository;
     }
 
-    public String gerarToken(RequisicaoDeLogin requisicaoDeLogin) {
-        var usuario = usuarioRepository.findByUsuario(requisicaoDeLogin.usuario());
-        Instant agora = Instant.now();
-        long expiraEm = 86400L;
+    public String generateToken(LoginRequest loginRequest) {
+        var user = usuarioRepository.findByUsername(loginRequest.username());
+        Instant now = Instant.now();
+        long expiresIn = 86400L;
 
-        var scopes = usuario.get().getNivelDeAcesso()
+        var scopes = user.get().getAccessLevels()
                 .stream()
-                .map(NivelDeAcesso::getNomeNivelDeAcesso)
+                .map(AccessLevel::getAccessLevelName)
                 .collect(Collectors.joining(" "));
 
         var claims = JwtClaimsSet.builder()
                 .issuer("attos-soluctions")
-                .issuedAt(agora)
-                .expiresAt(agora.plusSeconds(expiraEm))
-                .subject(usuario.get().getUsuarioId().toString())
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expiresIn))
+                .subject(user.get().getUserId().toString())
                 .claim("scope", scopes)
-                .claim("tenant:", usuario.get().getTenantId())
+                .claim("tenant:", user.get().getTenantId())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    public boolean validarToken(String tokenDeAcesso) {
+    public boolean validateToken(String accessToken) {
         try {
-            Instant agora = Instant.now();
-            Instant dataDeExpiracao;
+            Instant now = Instant.now();
+            Instant expireDate;
 
-            if (tokenDeAcesso != null) {
-                Jwt tokenDecriptografado = jwtDecoder.decode(tokenDeAcesso);
-                dataDeExpiracao = tokenDecriptografado.getExpiresAt();
+            if (accessToken != null) {
+                Jwt tokenDecriptografado = jwtDecoder.decode(accessToken);
+                expireDate = tokenDecriptografado.getExpiresAt();
 
-                if (dataDeExpiracao != null && dataDeExpiracao.isAfter(agora)) {
+                if (expireDate != null && expireDate.isAfter(now)) {
                     return true;
                 } else {
                     return false;

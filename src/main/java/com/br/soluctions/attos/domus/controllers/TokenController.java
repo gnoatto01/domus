@@ -10,49 +10,48 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.br.soluctions.attos.domus.dtos.RequisicaoDeLogin;
-import com.br.soluctions.attos.domus.dtos.RespostaDeLogin;
-import com.br.soluctions.attos.domus.repositories.UsuarioRepository;
-import com.br.soluctions.attos.domus.services.AutenticacaoService;
-import com.br.soluctions.attos.domus.utils.RemoverParametrosJson;
+import com.br.soluctions.attos.domus.dtos.LoginRequest;
+import com.br.soluctions.attos.domus.dtos.LoginResponse;
+import com.br.soluctions.attos.domus.repositories.UserRepository;
+import com.br.soluctions.attos.domus.services.AuthenticationService;
+import com.br.soluctions.attos.domus.utils.RemoveJsonParameters;
 
 @RestController
 @RequestMapping("/api")
 public class TokenController {
-    private final AutenticacaoService autenticacaoService;
-    private final UsuarioRepository usuarioRepository;
+    private final AuthenticationService authenticationService;
+    private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    RemoverParametrosJson removerParametrosJson;
+    RemoveJsonParameters removeJsonParameters;
 
-    public TokenController(AutenticacaoService autenticacaoService, UsuarioRepository usuarioRepository,
-            BCryptPasswordEncoder bCryptPasswordEncoder, RemoverParametrosJson removerParametrosJson) {
-        this.autenticacaoService = autenticacaoService;
-        this.usuarioRepository = usuarioRepository;
+    public TokenController(AuthenticationService authenticationService, UserRepository userRepository,
+            BCryptPasswordEncoder bCryptPasswordEncoder, RemoveJsonParameters removeJsonParameters) {
+        this.authenticationService = authenticationService;
+        this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.removerParametrosJson = removerParametrosJson;
+        this.removeJsonParameters = removeJsonParameters;
     }
 
-   
-    @PostMapping("/logar")
-    public ResponseEntity<RespostaDeLogin> efetuarLogin(@RequestBody RequisicaoDeLogin requisicaoDeLogin) {
-        var usuario = usuarioRepository.findByUsuario(requisicaoDeLogin.usuario());
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        var user = userRepository.findByUsername(loginRequest.username());
 
-        if (usuario.isEmpty() || !usuario.get().isLoginCorreto(requisicaoDeLogin, bCryptPasswordEncoder)) {
+        if (user.isEmpty() || !user.get().isCorrectLogin(loginRequest, bCryptPasswordEncoder)) {
             throw new BadCredentialsException("Usuario ou senha invalidos");
         }
 
-        var tokenDeAcesso = autenticacaoService.Autenticar(requisicaoDeLogin);
+        var accessToken = authenticationService.autenticate(loginRequest);
 
-        return ResponseEntity.ok(new RespostaDeLogin(tokenDeAcesso));
+        return ResponseEntity.ok(new LoginResponse(accessToken));
     }
 
-    @GetMapping("/verificar-token")
-    public boolean validarToken(@RequestHeader("Authorization") String tokenDeAcesso) {
-        tokenDeAcesso = removerParametrosJson.removerParametros(tokenDeAcesso, "tokenDeAcesso");
+    @GetMapping("/verify-token")
+    public boolean validateToken(@RequestHeader("Authorization") String accessToken) {
+        accessToken = removeJsonParameters.removeParameters(accessToken, "accessToken");
 
-        boolean isValido = autenticacaoService.ValidarToken(tokenDeAcesso);
+        boolean isValid = authenticationService.validateToken(accessToken);
 
-        if (isValido) {
+        if (isValid) {
             return true;
         } else {
             return false;

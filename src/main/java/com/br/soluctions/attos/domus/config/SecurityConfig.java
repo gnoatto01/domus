@@ -27,7 +27,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class ConfiguracaoDeSeguranca {
+public class SecurityConfig {
     
     @Value("${jwt.public.key}")
     private RSAPublicKey publicKey;
@@ -38,8 +38,8 @@ public class ConfiguracaoDeSeguranca {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/logar").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/verificar-token").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/verify-token").permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

@@ -28,7 +28,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    
+
     @Value("${jwt.public.key}")
     private RSAPublicKey publicKey;
     @Value("${jwt.private.key}")
@@ -40,16 +40,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/verify-token").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/verify-email").permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(); 
-                
+                .cors();
+
         return http.build();
     }
 
- 
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
@@ -67,4 +67,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-

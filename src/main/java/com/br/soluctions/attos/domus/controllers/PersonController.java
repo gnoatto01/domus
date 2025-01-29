@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.br.soluctions.attos.domus.dtos.PersonDto;
 import com.br.soluctions.attos.domus.entities.Person;
 
 import com.br.soluctions.attos.domus.services.PersonService;
@@ -32,6 +35,12 @@ public class PersonController {
 
         return ResponseEntity.ok(personList);
 
+    }
+
+    @PostMapping("new-person")
+    public ResponseEntity<Void> newPerson(@RequestBody PersonDto person) {
+        personService.newPerson(person);
+        return ResponseEntity.ok().build();
     }
 
 }

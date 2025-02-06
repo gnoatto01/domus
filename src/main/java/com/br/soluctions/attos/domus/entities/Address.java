@@ -13,23 +13,25 @@ import jakarta.persistence.Table;
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long addressId; 
+    private Long addressId;
 
-    private String street; 
+    private String street;
 
-    private String district; 
+    private String district;
 
-    private String city; 
+    private String city;
 
-    private String state; 
+    private String number;
 
-    private String cep; 
+    private String state;
+
+    private String cep;
 
     private String complement;
 
     @ManyToOne
     @JoinColumn(name = "person_id")
-    private Person person; 
+    private Person person;
 
     public Long getAddressId() {
         return addressId;
@@ -93,8 +95,14 @@ public class Address {
 
     public void setPerson(Person person) {
         this.person = person;
-    } 
+    }
 
-    
-    
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
 }

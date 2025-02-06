@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.br.soluctions.attos.domus.dtos.PersonDto;
 import com.br.soluctions.attos.domus.entities.Address;
+import com.br.soluctions.attos.domus.entities.LegalEntity;
 import com.br.soluctions.attos.domus.entities.NaturalPerson;
 import com.br.soluctions.attos.domus.entities.Person;
 import com.br.soluctions.attos.domus.repositories.AddressRepository;
+import com.br.soluctions.attos.domus.repositories.LegalEntityRepository;
 import com.br.soluctions.attos.domus.repositories.NaturalPersonRepository;
 import com.br.soluctions.attos.domus.repositories.PersonRepository;
 
@@ -19,19 +21,22 @@ import com.br.soluctions.attos.domus.repositories.PersonRepository;
 public class PersonService {
     private PersonRepository personRepository;
     private NaturalPersonRepository naturalPersonRepository;
+    private LegalEntityRepository legalEntityRepository;
     private AddressRepository addressRepository;
 
     public PersonService(PersonRepository personRepository, NaturalPersonRepository naturalPersonRepository,
-            AddressRepository addressRepository) {
+            AddressRepository addressRepository, LegalEntityRepository legalEntityRepository) {
         this.personRepository = personRepository;
         this.naturalPersonRepository = naturalPersonRepository;
+        this.legalEntityRepository = legalEntityRepository;
         this.addressRepository = addressRepository;
+
     }
 
     public List<Person> getPersons() {
         List<Person> personList = new ArrayList<>();
         try {
-            personList = personRepository.findAll();
+            personList = personRepository.findActivePersons();
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -51,6 +56,7 @@ public class PersonService {
             newPerson.setPhone(person.phone());
             newPerson.setCellPhone(person.cellPhone());
             newPerson.setEmail(person.email());
+            newPerson.setIsActive(person.isActive());
 
             personRepository.save(newPerson);
 
@@ -98,6 +104,22 @@ public class PersonService {
                 naturalPersonRepository.save(newNaturalPerson);
 
             } else if (person.personType().equals("J")) {
+                var newLegalEntity = new LegalEntity();
+
+                newLegalEntity.setCompanyName(person.companyName());
+                newLegalEntity.setTradeName(person.tradeName());
+                newLegalEntity.setCnpj(person.cnpj());
+                if (person.stateRegistration() != null) {
+                    newLegalEntity.setStateRegistration(person.stateRegistration());
+                }
+
+                if (person.municipalRegistrarion() != null) {
+                    newLegalEntity.setMunicipalRegistrarion(person.municipalRegistrarion());
+                }
+                newLegalEntity.setOpeningDate(person.openingDate());
+                newLegalEntity.setPerson(newPerson);
+
+                legalEntityRepository.save(newLegalEntity);
 
             } else {
                 System.err.println("Person type not exists");
@@ -111,6 +133,7 @@ public class PersonService {
             personAddress.setStreet(person.street());
             personAddress.setDistrict(person.district());
             personAddress.setCity(person.city());
+            personAddress.setNumber(person.number());
             personAddress.setState(person.state());
             personAddress.setCep(person.cep());
 

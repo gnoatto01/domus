@@ -1,5 +1,6 @@
 package com.br.soluctions.attos.domus.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,17 @@ public class Person {
     private String cellPhone;
 
     private String email;
+
+    @Column(columnDefinition = "VARCHAR(1) DEFAULT 'S'")
+    private String isActive;
+
+    public String getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(String isActive) {
+        this.isActive = isActive;
+    }
 
     public Long getPersonId() {
         return personId;
